@@ -51,6 +51,7 @@
 
     var editor = document.getElementById('editor');
     var isLocalChange = false;  // Flag para evitar loops
+    var currentPos = 0;  // Posição inicial do cursor
 
     // Função para obter a posição do cursor
     function getCaretPosition(element) {
@@ -96,16 +97,18 @@
 
     // Atualizando o editor com mudanças do Firebase
     database.ref('content').on('value', function(snapshot) {
-      if (isLocalChange) {
-        isLocalChange = false;  // Reseta a flag
-        return;
-      }
       var content = snapshot.val();
-      if (content !== editor.innerHTML) {
-        var currentPos = getCaretPosition(editor);
-        editor.innerHTML = content;
-        setCaretPosition(editor, currentPos);
-      }
+      var currentPosBefore = getCaretPosition(editor);  // Posição antes da atualização
+
+      // Atualiza o conteúdo do editor
+      editor.innerHTML = content;
+
+      // Calcula a posição final do cursor
+      var finalPos = currentPosBefore + (getCaretPosition(editor) - currentPos);
+      
+      // Define a posição do cursor
+      setCaretPosition(editor, finalPos);
+      currentPos = finalPos;  // Atualiza a posição atual do cursor
     });
 
   </script>
