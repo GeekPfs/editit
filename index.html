@@ -50,7 +50,6 @@
     var database = firebase.database();
 
     var editor = document.getElementById('editor');
-    var userId = 'user-' + Math.random().toString(36).substr(2, 16);
     var isLocalChange = false;  // Flag para evitar loops
 
     // Função para obter a posição do cursor
@@ -92,9 +91,7 @@
     editor.addEventListener('input', function() {
       isLocalChange = true;  // Indica que a mudança é local
       var content = editor.innerHTML;
-      var caretPos = getCaretPosition(editor);
       database.ref('content').set(content);
-      database.ref('users/' + userId).set(caretPos);
     });
 
     // Atualizando o editor com mudanças do Firebase
@@ -104,14 +101,10 @@
         return;
       }
       var content = snapshot.val();
-      editor.innerHTML = content;
-    });
-
-    // Atualizando a posição do cursor com mudanças do Firebase
-    database.ref('users').on('value', function(snapshot) {
-      var users = snapshot.val();
-      if (users && users[userId] !== undefined) {
-        setCaretPosition(editor, users[userId]);
+      if (content !== editor.innerHTML) {
+        var currentPos = getCaretPosition(editor);
+        editor.innerHTML = content;
+        setCaretPosition(editor, currentPos);
       }
     });
 
