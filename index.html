@@ -51,6 +51,7 @@
 
     var editor = document.getElementById('editor');
     var isLocalChange = false;  // Flag para evitar loops
+    var prevContent = '';       // Variável para armazenar o conteúdo anterior
 
     // Função para obter a posição do cursor
     function getCaretPosition(element) {
@@ -100,41 +101,32 @@
         var content = snapshot.val();
         var currentPos = getCaretPosition(editor);
         var scrollTop = editor.scrollTop;
-        var selection = window.getSelection();
-        var anchorNode = selection.anchorNode;
-        var anchorOffset = selection.anchorOffset;
-        
-        editor.innerHTML = content;
-        
-        // Restaura a seleção
-        if (anchorNode && anchorOffset >= 0) {
-          try {
-            var newRange = document.createRange();
-            var newNode = findNode(editor, anchorNode);
-            newRange.setStart(newNode, anchorOffset);
-            newRange.collapse(true);
-            selection.removeAllRanges();
-            selection.addRange(newRange);
-          } catch (err) {
-            console.error('Erro ao restaurar a seleção:', err);
-          }
+
+        // Calcula a diferença no tamanho do texto
+        var diff = content.length - prevContent.length;
+        prevContent = content;
+
+        // Ajusta a posição do cursor baseado na diferença
+        var newPos = currentPos + diff;
+        if (newPos < 0) {
+          newPos = 0;
+        } else if (newPos > content.length) {
+          newPos = content.length;
         }
 
+        editor.innerHTML = content;
+        setCaretPosition(editor, newPos);
         editor.scrollTop = scrollTop; // Mantém a posição de rolagem
       }
       isLocalChange = false;  // Reseta a flag após processar a mudança
     });
 
-    // Função para encontrar o nó correto no editor
-    function findNode(editor, node) {
-      var walker = document.createTreeWalker(editor, NodeFilter.SHOW_TEXT, null, false);
-      while (walker.nextNode()) {
-        if (walker.currentNode === node) {
-          return walker.currentNode;
-        }
-      }
-      return editor.firstChild;  // Retorna o primeiro filho se não encontrar
-    }
+    // Inicialização inicial do conteúdo
+    database.ref('content').once('value', function(snapshot) {
+      var content = snapshot.val();
+      editor.innerHTML = content;
+      prevContent = content;
+    });
 
   </script>
 </body>
