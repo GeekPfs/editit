@@ -1,112 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realtime Chat with Firebase</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        #chat {
-            width: 50%;
-            max-width: 600px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        #messages {
-            list-style: none;
-            padding: 0;
-        }
-        #messages li {
-            padding: 8px 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        #message-form {
-            display: flex;
-        }
-        #message-form input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 3px;
-        }
-        #message-form button {
-            padding: 10px;
-            border: none;
-            background: #28a745;
-            color: #fff;
-            cursor: pointer;
-            border-radius: 3px;
-            margin-left: 10px;
-        }
-    </style>
+  <title>Editor em Tempo Real</title>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.8/firebase-database.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #editor {
+      width: 100%;
+      height: 90vh;
+      border: 1px solid #ccc;
+      padding: 10px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+  </style>
 </head>
 <body>
+  <div id="editor" contenteditable="true"></div>
 
-<div id="chat">
-    <ul id="messages"></ul>
-    <form id="message-form">
-        <input type="text" id="message-input" placeholder="Type a message..." required>
-        <button type="submit">Send</button>
-    </form>
-</div>
-
-<!-- Firebase Configuration -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-<script>
-    // Your web app's Firebase configuration
-    const firebaseConfig = {
-        apiKey: "AIzaSyA8XnSUXlWANcMsKX0TNjoZKqfhVQnTKQE",
-        authDomain: "chat-8823c.firebaseapp.com",
-        databaseURL: "https://chat-8823c-default-rtdb.firebaseio.com",
-        projectId: "chat-8823c",
-        storageBucket: "chat-8823c.appspot.com",
-        messagingSenderId: "355149222657",
-        appId: "1:355149222657:web:90c4d59a49c35a84900100"
+  <script>
+    // Configuração do Firebase
+    var firebaseConfig = {
+      apiKey: "AIzaSyDDWRJopKglnAu6Mx95Ssf_WxPiZ00D09o",
+      authDomain: "fir-78392.firebaseapp.com",
+      databaseURL: "https://fir-78392-default-rtdb.firebaseio.com/",
+      projectId: "fir-78392",
+      storageBucket: "fir-78392.appspot.com",
+      messagingSenderId: "553844437908",
+      appId: "1:553844437908:web:65dc97de27568e20a61581"
     };
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const db = firebase.database(app);
+    // Inicializando o Firebase
+    firebase.initializeApp(firebaseConfig);
+    var database = firebase.database();
 
-    // Reference to the messages node in the database
-    const messagesRef = db.ref('messages');
+    var editor = document.getElementById('editor');
 
-    // Listen for new messages
-    messagesRef.on('child_added', (snapshot) => {
-        const message = snapshot.val();
-        displayMessage(message.text);
+    // Sincronizando mudanças no editor com o Firebase
+    editor.addEventListener('input', function() {
+      var content = editor.innerHTML;
+      database.ref('content').set(content);
     });
 
-    // Display message in the chat
-    function displayMessage(text) {
-        const messages = document.getElementById('messages');
-        const messageElement = document.createElement('li');
-        messageElement.textContent = text;
-        messages.appendChild(messageElement);
-    }
-
-    // Handle form submission
-    document.getElementById('message-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const messageInput = document.getElementById('message-input');
-        const text = messageInput.value;
-        messagesRef.push({ text });
-        messageInput.value = '';
+    // Atualizando o editor com mudanças do Firebase
+    database.ref('content').on('value', function(snapshot) {
+      editor.innerHTML = snapshot.val();
     });
-</script>
 
+  </script>
 </body>
 </html>
