@@ -23,12 +23,18 @@
       border: 1px solid #ccc;
       padding: 10px;
       box-sizing: border-box;
-      font-size: 3vw; /* Tamanho de fonte responsivo */
+      font-size: 18px;
       background-color: #000;
       color: #fff;
       outline: none;
       overflow-y: auto;
-      line-height: 1.6; /* Espaçamento entre linhas */
+      white-space: pre-wrap; /* Para quebras de linha */
+      overflow-wrap: break-word; /* Para quebras de palavra */
+      scrollbar-width: none; /* Oculta a barra de rolagem do Firefox */
+      -ms-overflow-style: none; /* Oculta a barra de rolagem do IE/Edge */
+    }
+    #editor::-webkit-scrollbar {
+      display: none; /* Oculta a barra de rolagem do Chrome/Safari */
     }
   </style>
 </head>
