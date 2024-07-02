@@ -91,17 +91,24 @@
     editor.addEventListener('input', function(event) {
       isLocalChange = true;  // Indica que a mudança é local
       var content = editor.innerHTML;
-      database.ref('content').set(content);
+      var currentPos = getCaretPosition(editor);
+      var scrollTop = editor.scrollTop;
+      database.ref('content').set({
+        text: content,
+        caretPosition: currentPos
+      });
     });
 
     // Atualizando o editor com mudanças do Firebase
     database.ref('content').on('value', function(snapshot) {
-      if (!isLocalChange) {
-        var content = snapshot.val();
+      var data = snapshot.val();
+      if (!isLocalChange && data) {
+        var content = data.text;
+        var savedCaretPos = data.caretPosition;
         var currentPos = getCaretPosition(editor);
         var scrollTop = editor.scrollTop;
         editor.innerHTML = content;
-        setCaretPosition(editor, currentPos);
+        setCaretPosition(editor, savedCaretPos);
         editor.scrollTop = scrollTop; // Mantém a posição de rolagem
       }
       isLocalChange = false;  // Reseta a flag após processar a mudança
