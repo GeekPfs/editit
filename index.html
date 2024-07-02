@@ -55,6 +55,39 @@
     var editor = document.getElementById('editor');
     var isLocalChange = false;  // Flag para evitar loops
 
+    // Variáveis para controle de arrastar o conteúdo do editor
+    var isDragging = false;
+    var dragStartX = 0;
+    var dragStartY = 0;
+    var scrollLeftStart = 0;
+    var scrollTopStart = 0;
+
+    // Evento mousedown para iniciar o arraste
+    editor.addEventListener('mousedown', function(event) {
+      isDragging = true;
+      dragStartX = event.clientX;
+      dragStartY = event.clientY;
+      scrollLeftStart = editor.scrollLeft;
+      scrollTopStart = editor.scrollTop;
+      editor.style.cursor = 'grabbing'; // Altera o cursor para indicar arraste
+    });
+
+    // Evento mousemove para arrastar o conteúdo
+    editor.addEventListener('mousemove', function(event) {
+      if (isDragging) {
+        var deltaX = dragStartX - event.clientX;
+        var deltaY = dragStartY - event.clientY;
+        editor.scrollLeft = scrollLeftStart + deltaX;
+        editor.scrollTop = scrollTopStart + deltaY;
+      }
+    });
+
+    // Evento mouseup para encerrar o arraste
+    editor.addEventListener('mouseup', function(event) {
+      isDragging = false;
+      editor.style.cursor = 'auto'; // Restaura o cursor padrão
+    });
+
     // Função para obter a posição do cursor
     function getCaretPosition(element) {
       var caretOffset = 0;
