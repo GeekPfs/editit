@@ -18,7 +18,7 @@
       height: 100vh;
     }
     #editor {
-      width: 80%;
+      width: 100%; /* Alterado para ocupar 100% da largura disponível */
       height: 90vh;
       border: 1px solid #ccc;
       padding: 10px;
@@ -28,23 +28,20 @@
       color: #fff;
       outline: none;
       overflow-y: auto;
-      white-space: pre-wrap; /* Manter quebras de linha */
-      overflow-wrap: break-word; /* Quebrar palavras longas */
-      word-wrap: break-word; /* Quebrar palavras longas para navegadores antigos */
-      overflow-x: auto; /* Adicionar rolagem horizontal */
-      scrollbar-width: thin; /* Largura da barra de rolagem */
-      scrollbar-color: #555 #333; /* Cor da barra de rolagem */
+      white-space: pre-wrap; /* Manter quebra de linha conforme necessário */
+      overflow-x: auto; /* Adicionado para rolagem horizontal */
+      scrollbar-width: thin; /* Estiliza a barra de rolagem (Firefox) */
+      scrollbar-color: #888 #333; /* Estiliza a barra de rolagem (Firefox) */
     }
     #editor::-webkit-scrollbar {
-      width: 8px; /* Largura da barra de rolagem para navegadores WebKit */
+      width: 8px; /* Estiliza a barra de rolagem (Chrome, Safari) */
     }
     #editor::-webkit-scrollbar-track {
-      background: #333; /* Cor do fundo da barra de rolagem */
+      background: #333; /* Cor de fundo da barra de rolagem (Chrome, Safari) */
     }
     #editor::-webkit-scrollbar-thumb {
-      background-color: #555; /* Cor do controle da barra de rolagem */
-      border-radius: 4px; /* Borda arredondada do controle da barra de rolagem */
-      border: 1px solid #333; /* Borda da barra de rolagem */
+      background-color: #888; /* Cor do indicador da barra de rolagem (Chrome, Safari) */
+      border-radius: 4px; /* Borda arredondada do indicador da barra de rolagem (Chrome, Safari) */
     }
   </style>
 </head>
