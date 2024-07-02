@@ -81,13 +81,19 @@
     function setCaretPosition(element, offset) {
       var range = document.createRange();
       var sel = window.getSelection();
-      range.setStart(element.childNodes[0], offset);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
+      
+      // Verifica se o elemento tem nós filhos para evitar erros
+      if (element.childNodes.length > 0) {
+        // Ajusta o offset para não exceder o tamanho do conteúdo
+        offset = Math.min(offset, element.childNodes[0].length);
+        range.setStart(element.childNodes[0], offset);
+        range.collapse(true);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
     }
 
-    // Sincronizando mudanças no editor com o Firebase
+     // Sincronizando mudanças no editor com o Firebase
     editor.addEventListener('input', function(event) {
       isLocalChange = true;  // Indica que a mudança é local
       var content = editor.innerHTML;
@@ -98,10 +104,15 @@
     database.ref('content').on('value', function(snapshot) {
       if (!isLocalChange) {
         var content = snapshot.val();
-        var selection = getCaretPosition(editor); // Salva a posição do cursor
+        var currentPos = getCaretPosition(editor);
         var scrollTop = editor.scrollTop;
         editor.innerHTML = content;
-        setCaretPosition(editor, selection); // Restaura a posição do cursor
+        
+        // Ajusta a posição do cursor se necessário
+        if (currentPos <= editor.innerText.length) {
+          setCaretPosition(editor, currentPos);
+        }
+        
         editor.scrollTop = scrollTop; // Mantém a posição de rolagem
       }
       isLocalChange = false;  // Reseta a flag após processar a mudança
