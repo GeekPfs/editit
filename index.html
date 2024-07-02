@@ -51,7 +51,6 @@
 
     var editor = document.getElementById('editor');
     var isLocalChange = false;  // Flag para evitar loops
-    var lastCursorPosition = 0; // Última posição conhecida do cursor
 
     // Função para obter a posição do cursor
     function getCaretPosition(element) {
@@ -92,25 +91,32 @@
     editor.addEventListener('input', function(event) {
       isLocalChange = true;  // Indica que a mudança é local
       var content = editor.innerHTML;
-      database.ref('content').set(content);
+      var currentPos = getCaretPosition(editor);
+      database.ref('content').set({ content: content, caretPosition: currentPos });
     });
 
     // Atualizando o editor com mudanças do Firebase
     database.ref('content').on('value', function(snapshot) {
       if (!isLocalChange) {
-        var content = snapshot.val();
-        var currentPos = getCaretPosition(editor);
-        var scrollTop = editor.scrollTop;
+        var data = snapshot.val();
+        var remoteContent = data.content;
+        var remotePos = data.caretPosition;
 
-        // Verifica se houve uma edição abaixo da posição atual sem troca de linha
-        if (currentPos < lastCursorPosition && content.length > currentPos && content.charAt(currentPos) !== '\n') {
-          currentPos += 1; // Ajusta a posição para cima
+        // Atualiza o editor somente se o conteúdo remoto for diferente
+        if (editor.innerHTML !== remoteContent) {
+          var localPos = getCaretPosition(editor);
+          var diff = remotePos - localPos;
+
+          // Atualiza a posição do cursor localmente
+          if (diff !== 0) {
+            setCaretPosition(editor, localPos + diff);
+          }
+
+          // Mantém a rolagem
+          var scrollTop = editor.scrollTop;
+          editor.innerHTML = remoteContent;
+          editor.scrollTop = scrollTop;
         }
-
-        editor.innerHTML = content;
-        setCaretPosition(editor, currentPos);
-        editor.scrollTop = scrollTop; // Mantém a posição de rolagem
-        lastCursorPosition = currentPos; // Atualiza a última posição conhecida do cursor
       }
       isLocalChange = false;  // Reseta a flag após processar a mudança
     });
