@@ -28,13 +28,23 @@
       color: #fff;
       outline: none;
       overflow-y: auto;
-      white-space: pre-wrap; /* Para quebras de linha */
-      overflow-wrap: break-word; /* Para quebras de palavra */
-      scrollbar-width: none; /* Oculta a barra de rolagem do Firefox */
-      -ms-overflow-style: none; /* Oculta a barra de rolagem do IE/Edge */
+      white-space: pre-wrap; /* Manter quebras de linha */
+      overflow-wrap: break-word; /* Quebrar palavras longas */
+      word-wrap: break-word; /* Quebrar palavras longas para navegadores antigos */
+      overflow-x: auto; /* Adicionar rolagem horizontal */
+      scrollbar-width: thin; /* Largura da barra de rolagem */
+      scrollbar-color: #555 #333; /* Cor da barra de rolagem */
     }
     #editor::-webkit-scrollbar {
-      display: none; /* Oculta a barra de rolagem do Chrome/Safari */
+      width: 8px; /* Largura da barra de rolagem para navegadores WebKit */
+    }
+    #editor::-webkit-scrollbar-track {
+      background: #333; /* Cor do fundo da barra de rolagem */
+    }
+    #editor::-webkit-scrollbar-thumb {
+      background-color: #555; /* Cor do controle da barra de rolagem */
+      border-radius: 4px; /* Borda arredondada do controle da barra de rolagem */
+      border: 1px solid #333; /* Borda da barra de rolagem */
     }
   </style>
 </head>
