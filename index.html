@@ -19,18 +19,16 @@
     }
     #editor {
       width: 80%;
-      max-width: 800px;
       height: 90vh;
-      max-height: 600px;
       border: 1px solid #ccc;
       padding: 10px;
       box-sizing: border-box;
-      font-size: 18px;
+      font-size: 3vw; /* Tamanho de fonte responsivo */
       background-color: #000;
       color: #fff;
       outline: none;
       overflow-y: auto;
-      white-space: pre-wrap;
+      line-height: 1.6; /* Espaçamento entre linhas */
     }
   </style>
 </head>
@@ -93,7 +91,7 @@
     // Sincronizando mudanças no editor com o Firebase
     editor.addEventListener('input', function(event) {
       isLocalChange = true;  // Indica que a mudança é local
-      var content = editor.innerText; // Usando innerText para obter o texto, mantendo as quebras de linha
+      var content = editor.innerHTML;
       database.ref('content').set(content);
     });
 
@@ -101,7 +99,11 @@
     database.ref('content').on('value', function(snapshot) {
       if (!isLocalChange) {
         var content = snapshot.val();
-        editor.innerText = content; // Usando innerText para manter as quebras de linha
+        var currentPos = getCaretPosition(editor);
+        var scrollTop = editor.scrollTop;
+        editor.innerHTML = content;
+        setCaretPosition(editor, currentPos);
+        editor.scrollTop = scrollTop; // Mantém a posição de rolagem
       }
       isLocalChange = false;  // Reseta a flag após processar a mudança
     });
