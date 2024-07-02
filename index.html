@@ -51,6 +51,7 @@
 
     var editor = document.getElementById('editor');
     var isLocalChange = false;  // Flag para evitar loops
+    var lastCursorPosition = 0; // Última posição conhecida do cursor
 
     // Função para obter a posição do cursor
     function getCaretPosition(element) {
@@ -96,20 +97,21 @@
 
     // Atualizando o editor com mudanças do Firebase
     database.ref('content').on('value', function(snapshot) {
-      var content = snapshot.val();
-      var currentPos = getCaretPosition(editor);
-      var scrollTop = editor.scrollTop;
+      if (!isLocalChange) {
+        var content = snapshot.val();
+        var currentPos = getCaretPosition(editor);
+        var scrollTop = editor.scrollTop;
 
-      // Verifica se a mudança foi remota e ocorreu após a posição do cursor
-      if (!isLocalChange && getCaretPosition(editor) <= content.length) {
+        // Verifica se houve uma edição abaixo da posição atual sem troca de linha
+        if (currentPos < lastCursorPosition && content.length > currentPos && content.charAt(currentPos) !== '\n') {
+          currentPos += 1; // Ajusta a posição para cima
+        }
+
         editor.innerHTML = content;
         setCaretPosition(editor, currentPos);
         editor.scrollTop = scrollTop; // Mantém a posição de rolagem
-      } else {
-        editor.innerHTML = content;
-        editor.scrollTop = editor.scrollHeight; // Rola para o final
+        lastCursorPosition = currentPos; // Atualiza a última posição conhecida do cursor
       }
-
       isLocalChange = false;  // Reseta a flag após processar a mudança
     });
 
