@@ -91,26 +91,25 @@
     editor.addEventListener('input', function(event) {
       isLocalChange = true;  // Indica que a mudança é local
       var content = editor.innerHTML;
-      var currentPos = getCaretPosition(editor);
-      var scrollTop = editor.scrollTop;
-      database.ref('content').set({
-        text: content,
-        caretPosition: currentPos
-      });
+      database.ref('content').set(content);
     });
 
     // Atualizando o editor com mudanças do Firebase
     database.ref('content').on('value', function(snapshot) {
-      var data = snapshot.val();
-      if (!isLocalChange && data) {
-        var content = data.text;
-        var savedCaretPos = data.caretPosition;
-        var currentPos = getCaretPosition(editor);
-        var scrollTop = editor.scrollTop;
+      var content = snapshot.val();
+      var currentPos = getCaretPosition(editor);
+      var scrollTop = editor.scrollTop;
+
+      // Verifica se a mudança foi remota e ocorreu após a posição do cursor
+      if (!isLocalChange && getCaretPosition(editor) <= content.length) {
         editor.innerHTML = content;
-        setCaretPosition(editor, savedCaretPos);
+        setCaretPosition(editor, currentPos);
         editor.scrollTop = scrollTop; // Mantém a posição de rolagem
+      } else {
+        editor.innerHTML = content;
+        editor.scrollTop = editor.scrollHeight; // Rola para o final
       }
+
       isLocalChange = false;  // Reseta a flag após processar a mudança
     });
 
